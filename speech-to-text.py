@@ -1,7 +1,7 @@
 import whisper
 import fire
 
-def transcribe_mp3(mp3_filepath="lec1.mp3", model_size="base", language="ru"):
+def transcribe_mp3(mp3_filepath="/Users/vladimir/lec1.mp3", model_size="turbo", language="ru"):
     """
     Transcribes an MP3 file to text using Whisper.
 
@@ -14,8 +14,9 @@ def transcribe_mp3(mp3_filepath="lec1.mp3", model_size="base", language="ru"):
     print(f"Loading the '{model_size}' model for {language}...")
     model = whisper.load_model(model_size)
     
+    
     print("Transcribing audio. This may take a while...")
-    result = model.transcribe(mp3_filepath, language=language, fp16=False) # fp16=False is best for Mac CPU
+    result = model.transcribe(mp3_filepath, language=language, fp16=False, verbose=True) # fp16=False is best for Mac CPU
 
     print("\n--- Transcription Result ---")
     print(result["text"])
