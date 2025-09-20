@@ -1,4 +1,5 @@
 import os
+import re
 
 import requests
 
@@ -17,46 +18,83 @@ class TextSummarizer:
         self.model_uri = f"gpt://{self.folder_id}/yandexgpt"
         self.url = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
-    def _summarize_text(self, full_text: str) -> str:
+    def _request_model(self, text: str, mode: str = "chunk") -> str:
+        """Выполняет запрос к модели.
+        mode = 'chunk' → обычное сжатие чанка
+        mode = 'merge' → объединение всех частей без сокращения"""
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Api-Key {self.api_key}",
         }
 
+        if mode == "chunk":
+            user_prompt = (
+                "Уберите лишнюю информацию, но подробно сохраните все факты, описания, "
+                "информацию о том, как жили люди, об известных личностях, о датах и событиях. "
+                "Верните ответ в формате markdown:\n\n"
+                f"{text}"
+            )
+        elif mode == "merge":
+            user_prompt = (
+                "У тебя есть несколько подробных конспектов. "
+                "Объедини их в единый связный текст лекции, сохранив **все факты, даты, личности и детали**. "
+                "Не сокращай и не удаляй важное. "
+                "Просто оформи как цельный, хорошо структурированный конспект в формате markdown:\n\n"
+                f"{text}"
+            )
+        else:
+            raise ValueError("Unknown mode")
+
         prompt = {
             "modelUri": self.model_uri,
             "completionOptions": {
                 "stream": False,
-                "temperature": 0.3,
-                "maxTokens": None,
+                "temperature": 0.2,
+                "maxTokens": 10_000,
             },
             "messages": [
                 {
                     "role": "system",
                     "text": (
-                        "Вы профессиональный ассистент для суммаризации лекций по Истории Античности "
-                        "в университете. Создайте содержание на русском языке, выделяя ключевые идеи и тезисы, "
-                        "но сохраняя подробную информацию всех о фактах и понятиях. Ответ должен быть четким и "
-                        "структурированным и подробным"
+                        "Вы профессиональный ассистент для лекций по Истории Античности "
+                        "в университете. "
+                        "Вы должны сохранять подробную информацию о датах, фактах и понятиях. "
+                        "Ответ должен быть четким, структурированным и подробным."
                     ),
                 },
-                {
-                    "role": "user",
-                    "text": f"Cуммируйте подробно следующий текст, верните ответ в формате markdown:\n\n{full_text}",
-                },
+                {"role": "user", "text": user_prompt},
             ],
         }
 
-        print("Отправка запроса на суммаризацию...")
         response = requests.post(self.url, headers=headers, json=prompt)
 
         if response.status_code == 200:
             result = response.json()
             return result["result"]["alternatives"][0]["message"]["text"]
         else:
-            print(f"Ошибка API: {response.status_code}")
-            print(f"Ответ сервера: {response.text}")
-            raise Exception(f"Ошибка при выполнении запроса: {response.status_code}")
+            print(f"API Error: {response.status_code}")
+            print(f"Error: {response.text}")
+            raise Exception(f"Error: {response.status_code}")
+
+    def _split_text(self, text: str, max_chunk_size: int = 6000) -> list[str]:
+        """Разделяет текст на чанки примерно по max_chunk_size,
+        но только по границам предложений (точка/!?)."""
+        sentences = re.split(r"(?<=[.!?])\s+", text)
+
+        chunks = []
+        current_chunk = ""
+
+        for sentence in sentences:
+            if len(current_chunk) + len(sentence) + 1 <= max_chunk_size:
+                current_chunk += sentence + " "
+            else:
+                chunks.append(current_chunk.strip())
+                current_chunk = sentence + " "
+
+        if current_chunk:
+            chunks.append(current_chunk.strip())
+
+        return chunks
 
     def process_file(self, source_file_path: str, target_file_path: str):
         # Чтение исходного текста
@@ -64,7 +102,19 @@ class TextSummarizer:
             text = file.read()
 
         print("Summarization started ...")
-        final_summary = self._summarize_text(text)
+        parts = self._split_text(text, 10_000)
+
+        summaries = []
+        for idx, part in enumerate(parts, start=1):
+            print(f"Summarizing part {idx}/{len(parts)} (length={len(part)} chars) ...")
+            summary = self._request_model(part, mode="chunk")
+            summaries.append(f"### Part {idx}\n{summary}\n")
+
+        # Объединяем промежуточные результаты
+        merged_text = "\n\n".join(summaries)
+
+        print("Merging all parts into a final detailed summary ...")
+        final_summary = self._request_model(merged_text, mode="merge")
 
         # Запись результата
         with open(target_file_path, "w", encoding="utf-8") as output_file:
@@ -72,5 +122,5 @@ class TextSummarizer:
 
         print("Summarization completed successfully!")
         print(f"Original text length: {len(text)} characters")
-        print(f"Summary length: {len(final_summary)} characters")
+        print(f"Final summary length: {len(final_summary)} characters")
         print(f"Result saved to file: {target_file_path}")

@@ -4,7 +4,7 @@ from scripts.text_summarization import TextSummarizer
 
 
 def main():
-    file_name = "Тестовая лекция"
+    file_name = "lec1"
     source_dir = "/Users/vladimir/Desktop/Материалы курса по античности"
     temp_dir = "/Users/vladimir/Desktop/Материалы курса по античности/temp"
     target_dir = "/Users/vladimir/Obsidian/Ancient_History"
