@@ -29,6 +29,6 @@ def main(file_name=None):
 
 
 if __name__ == "__main__":
-    lectures_to_convert = [f"Лекция {i}" for i in range(3, 19)] + ["Лекция 20"]
+    lectures_to_convert = [f"Лекция {i}" for i in range(1, 10)]
     for file in lectures_to_convert:
         main(file_name=file)

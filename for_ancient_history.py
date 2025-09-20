@@ -28,6 +28,6 @@ def main(file_name=None):
 
 
 if __name__ == "__main__":
-    lectures_to_convert = [f"Лекция {i}" for i in range(1, 19)] + ["Лекция 20"]
+    lectures_to_convert = [f"Лекция {i}" for i in range(18, 19)] + ["Лекция 20"]
     for file in lectures_to_convert:
         main(file_name=file)
