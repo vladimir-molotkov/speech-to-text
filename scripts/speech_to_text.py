@@ -23,7 +23,7 @@ class AudioTranscriber:
         print(f"Loading the '{self.model_size}' model for {self.language}...")
         self.model = whisper.load_model(self.model_size)
 
-    def transcribe(self, mp3_file_path: str, transcription_file_path: str) -> str:
+    def transcribe_text(self, mp3_file_path: str, transcription_file_path: str) -> str:
         """
         Transcribe an MP3 file to text.
 

@@ -6,13 +6,13 @@ class AudioExtractor:
     """Handles audio extraction from video using ffmpeg."""
 
     @staticmethod
-    def mp4_to_mp3(mp4_path: str, mp3_path: str):
-        print(f"Converting {mp4_path} → {mp3_path} ...")
+    def extract_audio(video_path: str, audio_path: str):
+        print(f"Converting {video_path} → {audio_path} ...")
 
-        os.makedirs(os.path.dirname(mp3_path), exist_ok=True)
+        os.makedirs(os.path.dirname(audio_path), exist_ok=True)
 
         subprocess.run(
-            ["ffmpeg", "-y", "-i", mp4_path, mp3_path],
+            ["ffmpeg", "-y", "-i", video_path, audio_path],
             check=True,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,

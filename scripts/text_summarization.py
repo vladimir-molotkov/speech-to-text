@@ -96,7 +96,7 @@ class TextSummarizer:
 
         return chunks
 
-    def process_file(self, source_file_path: str, target_file_path: str):
+    def summazize_text(self, source_file_path: str, target_file_path: str):
         # Чтение исходного текста
         with open(source_file_path, "r", encoding="utf-8") as file:
             text = file.read()
