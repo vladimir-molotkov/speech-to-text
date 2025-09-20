@@ -25,10 +25,10 @@ def main(file_name=None):
     summarizer = TextSummarizer()
     summarizer.summazize_text(transcription_file_path, summary_file_path)
 
-    print(f"\n All steps completed successfully for file {video_file_path}")
+    print(f"All steps completed successfully for file {video_file_path}\n")
 
 
 if __name__ == "__main__":
-    lectures_to_convert = [f"Лекция {i}" for i in range(3, 19)] + ["Лекция 20"]
+    lectures_to_convert = [f"Лекция {i}" for i in range(14, 19)] + ["Лекция 20"]
     for file in lectures_to_convert:
         main(file_name=file)
