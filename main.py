@@ -14,14 +14,14 @@ def main(file_name=None):
     transcription_file_path = f"{temp_dir}/{file_name}.txt"
     summary_file_path = f"{target_dir}/{file_name}.md"
 
-    # Step 1: Convert MP4 → MP3
+    # Step 1: Extract audio from video file
     AudioExtractor.extract_audio(video_file_path, audio_file_path)
 
-    # Step 2: Transcribe MP3 → TXT
+    # Step 2: Transcribe text from audio file to txt file
     transcriber = AudioTranscriber(model_size="turbo", language="ru")
     transcriber.transcribe_text(audio_file_path, transcription_file_path)
 
-    # Step 3: Summarize TXT → Markdown
+    # Step 3: Summarize text to markdown file
     summarizer = TextSummarizer()
     summarizer.summazize_text(transcription_file_path, summary_file_path)
 
