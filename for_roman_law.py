@@ -6,7 +6,7 @@ from scripts.text_summarization import TextSummarizer
 def main(file_name=None):
     file_name = "Занятие 3"
     # source_dir = "/Users/vladimir/Desktop"
-    temp_dir = "/Users/vladimir/Desktop"
+    temp_dir = "/Users/vladimir/speech-to-text/temp/roman_law"
     target_dir = "/Users/vladimir/Obsidian/Roman_law"
 
     # video_file_path = f"{source_dir}/{file_name}.mp4"
