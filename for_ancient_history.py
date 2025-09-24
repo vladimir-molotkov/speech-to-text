@@ -21,7 +21,7 @@ def main(file_name=None):
     transcriber.transcribe_text(audio_file_path, transcription_file_path)
 
     # Step 3: Summarize text to markdown file
-    summarizer = TextSummarizer()
+    summarizer = TextSummarizer(subject="по Истории Античности")
     summarizer.summazize_text(transcription_file_path, summary_file_path)
 
     print(f"All steps completed successfully for file {video_file_path}\n")
